@@ -53,6 +53,7 @@ It was started from kickstart, then enhanced manually & using AI-assistance
 <l>gG     Open new tab with Global diagnostics
 <l>gA     Code action for current line
 K         Hover info
+<S-F12>   Switch .h/.cpp
 ```
 
 #### Tools
@@ -104,7 +105,6 @@ y/p       Copy/Paste to/from NVim buffers only
 <S-F10>   Width +2
 <S-F11>   Maximize width
 <F12>     Next split
-<S-F12>   Prev split
 ```
 
 #### Completion (insert mode, blink.cmp)

@@ -773,19 +773,21 @@ require('lazy').setup({
 -- [Windows]
 -- Resizing
 vim.keymap.set('n', '<F9>', '<cmd>resize -2<CR>')           -- <F9>   makes height smaller
-vim.keymap.set('n', '<F21>', '<cmd>vertical resize -2<CR>') -- <F21>  makes width smaller
+vim.keymap.set('n', '<F21>', '<cmd>vertical resize -2<CR>') -- <S-F9>  makes width smaller
 vim.keymap.set('n', '<F10>', '<cmd>resize +2<CR>')          -- <F10>  makes height bigger
-vim.keymap.set('n', '<F22>', '<cmd>vertical resize +2<CR>') -- <F22>  makes width bigger
+vim.keymap.set('n', '<F22>', '<cmd>vertical resize +2<CR>') -- <S-F10>  makes width bigger
 vim.keymap.set('n', '<F11>', '<cmd>resize<CR>')             -- <F11>  maximizes height
-vim.keymap.set('n', '<F23>', '<cmd>vertical resize<CR>')    -- <F23>  maximizes width
+vim.keymap.set('n', '<F23>', '<cmd>vertical resize<CR>')    -- <S-F11>  maximizes width
 vim.keymap.set('n', '<F12>', '<C-w>w')                      -- <F12>  next split
-vim.keymap.set('n', '<F24>', '<C-w>W')                      -- <F24>  prev split
 -- Wrapping/Unwrapping
 vim.o.wrap = false
 vim.keymap.set('n', '<F4>', '<cmd>set wrap!<CR>')           -- <F4>   toggles fitting long lines by breaking them, or letting them go beyond the width
 vim.o.breakindent = true
 
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')         -- drop highlighting of the current search
+
+vim.keymap.set('n', '<F24>', '<cmd>LspClangdSwitchSourceHeader<CR>')  -- <S-F12>  Header/Source smart switch
+
 
 -- [Git]
 vim.keymap.set('n', '<leader>ob', '<cmd>Gitsigns blame<CR>', { desc = '[B]lame' })
