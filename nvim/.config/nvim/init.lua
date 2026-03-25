@@ -183,22 +183,22 @@ require('lazy').setup({
     },
     keys = {
       {
-        "<leader>oi",
+        "<leader>ooi",
         "<CMD>Octo issue list<CR>",
         desc = "[I]ssues",
       },
       {
-        "<leader>op",
+        "<leader>oop",
         "<CMD>Octo pr list<CR>",
         desc = "[PR]s",
       },
       -- {
-      --   "<leader>on",
+      --   "<leader>oon",
       --   "<CMD>Octo notification list<CR>",
       --   desc = "[N]otifications",
       -- },
       {
-        "<leader>os",
+        "<leader>oos",
         function()
           require("octo.utils").create_base_search_command { include_current_repo = true }
         end,
@@ -258,6 +258,7 @@ require('lazy').setup({
         { '<leader>g', group = '[G]o' },
         { '<leader>h', group = '[H]elp' },
         { '<leader>o', group = '[O] Git' },
+        { '<leader>oo', group = '[O]cto' },
         { '<leader>t', group = '[T]ools' },
       },
     },
@@ -790,29 +791,14 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')         -- drop highlighting
 vim.keymap.set('n', '<leader>ob', '<cmd>Gitsigns blame<CR>', { desc = '[B]lame' })
 vim.keymap.set('n', '<leader>od', '<cmd>DiffviewOpen<CR>', { desc = '[D]iff' })
 
--- Suuuper handy function to find PR where the current line has been introduced
--- It opens results in a side split, and <CR> on links opens them in a browser
-vim.keymap.set('n', '<leader>oP', function()
-  -- git blame for the current line (porcelain: "<sha> <orig_line> <cur_line> <count>")
-  local line = vim.fn.line('.')
-  local file = vim.fn.expand('%:p')
-  local git_root = vim.trim(vim.fn.system({'git', 'rev-parse', '--show-toplevel'}))
-  local rel_path = file:sub(#git_root + 2) -- path relative to repo root
-  local blame = vim.fn.system({'git', 'blame', '-L', line..','..line, '--porcelain', file})
-  local sha, orig_line = blame:match('^(%x+)%s+(%d+)') -- orig_line = line number at the time of commit
-  if not sha or sha:match('^0+$') then
-    vim.notify('No commit for this line', vim.log.levels.WARN)
-    return
-  end
-
+-- Look up PRs for a given SHA and display results in a side split
+local function find_pr_and_display(sha, diff_anchor)
   -- GitHub repo slug from remote URL
   local remote_url = vim.trim(vim.fn.system({'git', 'remote', 'get-url', 'origin'}))
   local repo = remote_url:match('github%.com[:/](.+)$'):gsub('%.git$', '')
 
-  -- PR diff anchor: #diff-<sha256 of file path>R<original line> — jumps to the exact line in PR diff
-  local diff_anchor = '#diff-' .. vim.fn.sha256(rel_path) .. 'R' .. orig_line
-
   local function diff_link(pr_number)
+    if not diff_anchor then return nil end
     return 'https://github.com/' .. repo .. '/pull/' .. pr_number .. '/files' .. diff_anchor
   end
 
@@ -845,7 +831,8 @@ vim.keymap.set('n', '<leader>oP', function()
           table.insert(output, 'PRs:')
           for _, pr in ipairs(prs) do
             table.insert(output, '#' .. pr.number .. ' ' .. pr.url)
-            table.insert(output, diff_link(pr.number))
+            local dl = diff_link(pr.number)
+            if dl then table.insert(output, dl) end
             table.insert(output, '')
           end
         else
@@ -855,7 +842,34 @@ vim.keymap.set('n', '<leader>oP', function()
       end)
     end
   )
-end, { desc = 'Find [PR]' })
+end
+
+-- Find PR for the current line via git blame
+vim.keymap.set('n', '<leader>op', function()
+  local line = vim.fn.line('.')
+  local file = vim.fn.expand('%:p')
+  local git_root = vim.trim(vim.fn.system({'git', 'rev-parse', '--show-toplevel'}))
+  local rel_path = file:sub(#git_root + 2) -- path relative to repo root
+  local blame = vim.fn.system({'git', 'blame', '-L', line..','..line, '--porcelain', file})
+  local sha, orig_line = blame:match('^(%x+)%s+(%d+)') -- orig_line = line number at the time of commit
+  if not sha or sha:match('^0+$') then
+    vim.notify('No commit for this line', vim.log.levels.WARN)
+    return
+  end
+  -- PR diff anchor: #diff-<sha256 of file path>R<original line> — jumps to the exact line in PR diff
+  local diff_anchor = '#diff-' .. vim.fn.sha256(rel_path) .. 'R' .. orig_line
+  find_pr_and_display(sha, diff_anchor)
+end, { desc = 'Find [PR] for line' })
+
+-- Find PR for the SHA under cursor
+vim.keymap.set('n', '<leader>oP', function()
+  local word = vim.fn.expand('<cword>')
+  if not word:match('^%x+$') or #word < 7 then
+    vim.notify('Word under cursor is not a valid SHA (need at least 7 hex chars)', vim.log.levels.WARN)
+    return
+  end
+  find_pr_and_display(word, nil)
+end, { desc = 'Find [PR] for SHA' })
 
 -- <C-o>/<C-i>: jump between files (bufjump.nvim), skipping within-file positions
 -- <C-p>: walk the full jumplist (original <C-o> behavior, including within-file)

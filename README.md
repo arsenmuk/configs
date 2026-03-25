@@ -75,11 +75,12 @@ gcc       Comment line
 ```
 <l>ob     Blame
 <l>od     Diffview
-<l>oP     Find PR for current line
+<l>op     Find PR for current line
+<l>oP     Find PR for SHA
 <l>oH     File history
-<l>oi     GitHub Issues
-<l>op     GitHub PRs
-<l>os     Search GitHub
+<l>ooi    GitHub Issues
+<l>oop    GitHub PRs
+<l>oos    Search GitHub
 ```
 
 #### Clipboard
