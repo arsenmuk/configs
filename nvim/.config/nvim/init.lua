@@ -875,7 +875,8 @@ end, { desc = 'Find [PR] for SHA' })
 
 -- <C-o>/<C-i>: jump between files (bufjump.nvim), skipping within-file positions
 -- <C-p>: walk the full jumplist (original <C-o> behavior, including within-file)
-vim.keymap.set('n', '<C-p>', '<C-o>', { desc = 'Jump back full', noremap = true })
+vim.keymap.set('n', '<C-]>', '<C-o>', { desc = 'Jump back full', noremap = true })
+vim.keymap.set('n', '<C-[>', '<C-i>', { desc = 'Jump back full', noremap = true })
 
 -- Hover 'K' hint
 vim.keymap.set('n', 'K', function() require('hover').open() end, { desc = 'Hover' })
