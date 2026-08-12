@@ -102,7 +102,9 @@ colorscheme catppuccin_mocha
 " ============================================================================
 " LSP Configuration
 " ============================================================================
-if executable('clangd')
+let g:register_clangd = 1          " register clangd so the <leader>tc toggle can enable it
+
+if g:register_clangd
     au User lsp_setup call lsp#register_server({
         \ 'name': 'clangd',
         \ 'cmd': {server_info->[
@@ -126,6 +128,17 @@ let g:lsp_diagnostics_echo_cursor = 1
 let g:lsp_highlights_enabled = 1
 "let g:lsp_preview_keep_focus = 0
 let g:lsp_signs_enabled = 1
+
+" <leader>tc — toggle clangd on/off in-flight (clangd is vim-lsp's only server here)
+let g:clangd_on = 1
+function! s:ToggleClangd() abort
+    if g:clangd_on
+        call lsp#disable() | let g:clangd_on = 0 | echo 'clangd OFF'
+    else
+        call lsp#enable()  | let g:clangd_on = 1 | echo 'clangd ON'
+    endif
+endfunction
+nnoremap <silent> <leader>tc :call <SID>ToggleClangd()<CR>
 
 " ============================================================================
 " FZF Configuration

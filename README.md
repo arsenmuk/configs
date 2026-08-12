@@ -62,6 +62,7 @@ K         Hover info
 <l>tn     Rename symbol
 <l>th     Toggle inlay hints
 <l>tm     Toggle inline diagnostics
+<l>t      Toggle clangd on/off (useful to prevent heavy indexing from happenning)
 
 <C-o>     Jump to last position in the previous buffer
 <C-i>     Jump to the next buffer

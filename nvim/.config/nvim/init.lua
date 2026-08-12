@@ -522,6 +522,26 @@ require('lazy').setup({
       -- .. and the remaining ones, we configure manually
       vim.lsp.config('clangd', servers['clangd'])
       vim.lsp.enable('clangd')
+
+      -- <leader>tc — toggle clangd on/off in-flight
+      local clangd_on = true
+      vim.keymap.set('n', '<leader>tc', function()
+        clangd_on = not clangd_on
+        vim.lsp.enable('clangd', clangd_on)
+        if clangd_on then -- reattach to open C/C++ buffers without reloading them
+          for _, b in ipairs(vim.api.nvim_list_bufs()) do
+            if vim.api.nvim_buf_is_loaded(b) and (vim.bo[b].filetype == 'c' or vim.bo[b].filetype == 'cpp') then
+              vim.api.nvim_exec_autocmds('FileType', { buffer = b })
+            end
+          end
+        else -- stop running clangd clients gracefully (no force -> clean exit 0, no error)
+          for _, c in ipairs(vim.lsp.get_clients { name = 'clangd' }) do
+            vim.lsp.stop_client(c.id)
+          end
+        end
+        vim.notify('clangd ' .. (clangd_on and 'ON' or 'OFF'))
+      end, { desc = '[C]langd toggle' })
+
       --vim.lsp.config('pyright', servers['pyright'])
       --vim.lsp.enable('pyright')
     end,
