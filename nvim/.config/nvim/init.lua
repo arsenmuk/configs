@@ -521,7 +521,9 @@ require('lazy').setup({
       }
       -- .. and the remaining ones, we configure manually
       vim.lsp.config('clangd', servers['clangd'])
-      vim.lsp.enable('clangd')
+      if vim.fn.executable('clangd') == 1 then
+        vim.lsp.enable('clangd')
+      end
 
       -- <leader>tc — toggle clangd on/off in-flight
       local clangd_on = true

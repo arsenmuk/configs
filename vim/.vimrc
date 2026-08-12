@@ -104,7 +104,7 @@ colorscheme catppuccin_mocha
 " ============================================================================
 let g:register_clangd = 1          " register clangd so the <leader>tc toggle can enable it
 
-if g:register_clangd
+if g:register_clangd && executable('clangd')
     au User lsp_setup call lsp#register_server({
         \ 'name': 'clangd',
         \ 'cmd': {server_info->[
